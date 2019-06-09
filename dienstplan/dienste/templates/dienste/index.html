@@ -1,0 +1,44 @@
+{% extends 'dienstplan/base.html' %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<table border="1">
+    <tr>
+        <th>Tag</th>
+        <th>Start</th>
+        <th>Ende</th>
+        <th>Wagenart</th>
+        {% for dienstart in dienste_list.first.besatzung.all %}
+            <th>{{ dienstart.art.name }}</th>
+        {% endfor %}
+    </tr>
+    {% for dienst in dienste_list %}
+    <tr>
+        <td>{{ dienst.tag }}</td>
+        <td>{{ dienst.schicht.start }}</td>
+        <td>{{ dienst.schicht.bis }}</td>
+        <td>{{ dienst.schicht.wagenart.name }}</td>
+        {% for besatzung in dienst.besatzung.all %}
+            <td>
+                {% if besatzung.personal.name %}
+                    {% if besatzung.berufer %}
+                        HA:
+                    {% endif %}
+                    {{ besatzung.personal.name }}
+                {% else %}
+                    {% if besatzung.berufer %}
+                        Berufer
+                    {% endif %}
+                {% endif %}
+                {% if besatzung.bemerkung %}
+                    <i>{{ besatzung.bemerkung}}</i>
+                {% endif %}
+            </td>
+        {% endfor %}
+    </tr>
+     {% endfor %}
+</table>
+{% else %}
+No Access!
+{% endif %}
+{% endblock content %}

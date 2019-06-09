@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+    <title>{% block title %}{{ page_title|default:"Untitled Page" }}{% endblock title %}</title>
+</head>
+<body>
+<ul class="sidebar-nav">
+   {% if user.is_authenticated %}
+     <li>User: {{ user.get_username }}</li>
+     <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
+   {% else %}
+     <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
+   {% endif %}
+  </ul>
+{% block content %}
+<p>Placeholder text in base template. Replace with page content.</p>
+{% endblock content %}
+</body>
+</html>
