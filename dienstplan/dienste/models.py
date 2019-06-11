@@ -6,6 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+import datetime
 
 
 class DpBesatzung(models.Model):
@@ -35,6 +36,9 @@ class DpDienste(models.Model):
 
     def ordner_name(self):
         return self.ordner.name
+
+    def calenderweek(self):
+        return datetime.date(self.ordner.jahr, self.ordner.monat_uint,  int(self.tag )).isocalendar()[1]
 
     class Meta:
         managed = False
@@ -109,8 +113,10 @@ class DpNachrichtUser(models.Model):
 
 
 class DpOrdner(models.Model):
+    ordnerid = models.AutoField(primary_key=True,db_column='id')
     name = models.CharField(max_length=255, blank=True, null=True)
     monat = models.CharField(max_length=2, blank=True, null=True)
+    monat_uint = models.IntegerField(max_length=2,db_column='monat_uint')
     jahr = models.IntegerField()
     dienstplan = models.ForeignKey(DpDienstplan, models.DO_NOTHING, db_column='dienstplan')
     lock = models.IntegerField()

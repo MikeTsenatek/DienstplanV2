@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>{% block title %}{{ page_title|default:"Untitled Page" }}{% endblock title %}</title>
+    <title>{% block title %}{{ page_title|default:"Dienstplan" }}{% endblock title %}</title>
     {# Load the tag library #}
     {% load bootstrap4 %}
 
@@ -29,24 +29,28 @@ code {
   font-size: 80%;
 }
 
+body {
+  padding-top: 5rem;
+}
+main > .container {
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+
+
+
+
 
     </style>
 </head>
 {% load dienstplan_ordner %}
 
 <body>
-<ul class="sidebar-nav">
-    {% if user.is_authenticated %}
-    <li>User: {{ user.get_username }}</li>
-    <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>
-    {% else %}
-    <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>
-    {% endif %}
-</ul>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
     <a class="navbar-brand" href="#">Dienstplan</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarsExampleDefault,#navbarsExampleDefault2"
             aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -66,8 +70,8 @@ code {
                 <div class="dropdown-menu" aria-labelledby="dropdown01">
                     {% getdienstplan as dienstplanarray %}
                     {% for dienstplan in dienstplanarray %}
-                    <a class="dropdown-item" href="#">{{ dienstplan.name }}</a>
-                   {% endfor %}
+                    <a class="dropdown-item" href="{% url 'dienste:bydienstplanid' dienstplanid=dienstplan.id %} ">{{ dienstplan.name }}</a>
+                    {% endfor %}
                 </div>
             </li>
         </ul>
@@ -79,10 +83,12 @@ code {
     <div class="row">
 
         <main role="main" class="flex-shrink-0">
+            <div class="container">
+                {% block content %}
+                <p>Placeholder text in base template. Replace with page content.</p>
+                {% endblock content %}
 
-            {% block content %}
-            <p>Placeholder text in base template. Replace with page content.</p>
-            {% endblock content %}
+            </div>
         </main>
     </div>
 </div>
