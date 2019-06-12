@@ -105,7 +105,7 @@ class DpFunktionsvk(models.Model):
 
 class DpFunktion(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
-    dienstplan = models.IntegerField()
+    dienstplan = models.ForeignKey('dienste.DpDienstplan', models.DO_NOTHING, db_column='dienstplan')
     order = models.IntegerField()
     wachgeld = models.DecimalField(max_digits=6, decimal_places=2)
     wachgeld_art = models.IntegerField()

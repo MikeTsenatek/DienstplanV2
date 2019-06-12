@@ -47,6 +47,7 @@ class DpDienste(models.Model):
 
 
 class DpDienstplan(models.Model):
+    id = models.AutoField(primary_key=True,db_column='id')
     name = models.CharField(max_length=255, blank=True, null=True)
     showwagenfilter = models.IntegerField()
     showwachenfilter = models.IntegerField()
@@ -56,6 +57,16 @@ class DpDienstplan(models.Model):
 
     def __str__(self):
         return self.name
+
+    def hasAccess(self, user):
+        if self.inactive:
+            return False
+        if self.viewable:
+            return True
+        for function in user.dpmitglieder.dpfunktion_set.all():
+            if function.dienstplan == self:
+                return True
+        return False
 
     class Meta:
         managed = False
@@ -116,7 +127,7 @@ class DpOrdner(models.Model):
     ordnerid = models.AutoField(primary_key=True,db_column='id')
     name = models.CharField(max_length=255, blank=True, null=True)
     monat = models.CharField(max_length=2, blank=True, null=True)
-    monat_uint = models.IntegerField(max_length=2,db_column='monat_uint')
+    monat_uint = models.IntegerField(db_column='monat_uint')
     jahr = models.IntegerField()
     dienstplan = models.ForeignKey(DpDienstplan, models.DO_NOTHING, db_column='dienstplan')
     lock = models.IntegerField()

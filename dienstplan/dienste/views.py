@@ -5,9 +5,9 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 import datetime
 from django.db.models import Q
+from django.core.exceptions import PermissionDenied
 
-
-from .models import DpDienste,DpBesatzung,DpDienstplanFelder,DpOrdner
+from .models import DpDienste,DpBesatzung,DpDienstplan,DpOrdner
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
@@ -25,9 +25,9 @@ class IndexView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self, ):
         if 'dienstplanid' in self.kwargs:
-            self.dienstplanid = self.kwargs['dienstplanid'];
+            self.dienstplanid = int(self.kwargs['dienstplanid']);
         else:
-            self.dienstplanid = self.request.user.dpmitglieder.startdp
+            self.dienstplanid = int(self.request.user.dpmitglieder.startdp)
 
         if 'ordnerid' in self.kwargs:
             ordnerid = self.kwargs['ordnerid']
@@ -37,6 +37,9 @@ class IndexView(LoginRequiredMixin, generic.ListView):
             ordnerid = DpOrdner.objects.filter((Q(monat_uint__lte=today.month) & Q(jahr=today.year) | Q(jahr__lt=today.year))
                                                & Q(dienstplan=self.dienstplanid) & Q(lock__lt = 3)).order_by('-jahr','-monat_uint')[:1].get().ordnerid
 
-        return DpDienste.objects.filter(ordner=ordnerid).select_related('schicht').\
+        if DpDienstplan.objects.filter(id=self.dienstplanid)[:1].get().hasAccess(self.request.user):
+            return DpDienste.objects.filter(ordner=ordnerid).select_related('schicht').\
             prefetch_related('besatzung__personal').select_related('schicht__wagenart')
+        else:
+            raise PermissionDenied('You are not allowed to view this plan')
 
