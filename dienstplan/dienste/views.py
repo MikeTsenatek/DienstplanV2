@@ -1,13 +1,12 @@
-from django.shortcuts import render
-
 # Create your views here.
-from django.views import generic
-from django.contrib.auth.mixins import LoginRequiredMixin
 import datetime
-from django.db.models import Q
-from django.core.exceptions import PermissionDenied
 
-from .models import DpDienste,DpBesatzung,DpDienstplan,DpOrdner
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from django.views import generic
+
+from .models import DpDienste, DpDienstplan, DpOrdner
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
@@ -20,14 +19,14 @@ class IndexView(LoginRequiredMixin, generic.ListView):
         data = super().get_context_data(**kwargs)
         data['user'] = self.request.user
         data['ordner'] = DpOrdner.objects.filter(Q(dienstplan=self.dienstplanid) & Q(lock__lt = 3)).order_by('-jahr','-monat_uint')
-
+        data['admin'] = DpDienstplan.objects.filter(id=self.dienstplanid)[:1].get().isadmin(self.request.user)
         return data
 
     def get_queryset(self, ):
         if 'dienstplanid' in self.kwargs:
             self.dienstplanid = int(self.kwargs['dienstplanid']);
         else:
-            self.dienstplanid = int(self.request.user.dpmitglieder.startdp)
+            self.dienstplanid = self.request.user.dpmitglieder.startdp.id
 
         if 'ordnerid' in self.kwargs:
             ordnerid = self.kwargs['ordnerid']
