@@ -41,6 +41,7 @@ main > .container {
 
 
 
+
     </style>
 </head>
 {% load dienstplan_ordner %}
@@ -70,7 +71,8 @@ main > .container {
                 <div class="dropdown-menu" aria-labelledby="dropdown01">
                     {% getdienstplan as dienstplanarray %}
                     {% for dienstplan in dienstplanarray %}
-                    <a class="dropdown-item" href="{% url 'dienste:bydienstplanid' dienstplanid=dienstplan.id %} ">{{ dienstplan.name }}</a>
+                    <a class="dropdown-item"
+                       href="{% url 'dienste:bydienstplanid' dienstplanid=dienstplan.id %} ">{{ dienstplan.name }}</a>
                     {% endfor %}
                 </div>
             </li>
@@ -79,16 +81,14 @@ main > .container {
 </nav>
 
 
-<div class="container-fluid">
+<div class="container">
     <div class="row">
 
         <main role="main" class="flex-shrink-0">
-            <div class="container">
                 {% block content %}
                 <p>Placeholder text in base template. Replace with page content.</p>
                 {% endblock content %}
 
-            </div>
         </main>
     </div>
 </div>

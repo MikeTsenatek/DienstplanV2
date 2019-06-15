@@ -4,8 +4,10 @@ import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
+from django.http import JsonResponse
 from django.views import generic
 
+from user.models import DpFunktion
 from .models import DpDienste, DpDienstplan, DpOrdner
 
 
@@ -20,6 +22,7 @@ class IndexView(LoginRequiredMixin, generic.ListView):
         data['user'] = self.request.user
         data['ordner'] = DpOrdner.objects.filter(Q(dienstplan=self.dienstplanid) & Q(lock__lt = 3)).order_by('-jahr','-monat_uint')
         data['admin'] = DpDienstplan.objects.filter(id=self.dienstplanid)[:1].get().isadmin(self.request.user)
+        data['funktionen'] = DpFunktion.objects.all()
         return data
 
     def get_queryset(self, ):
@@ -42,3 +45,9 @@ class IndexView(LoginRequiredMixin, generic.ListView):
         else:
             raise PermissionDenied('You are not allowed to view this plan')
 
+
+
+def userbyfunktion(request, funktionid, name):
+
+    return JsonResponse(list(DpFunktion.objects.filter(Q(id=funktionid) & Q(mitglied__name__startswith=name)).values_list(
+        'mitglied__name')), safe=False)
